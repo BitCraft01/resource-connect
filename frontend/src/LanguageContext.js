@@ -6,6 +6,7 @@ const LanguageContext = createContext();
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState('en');
   const [lowBandwidth, setLowBandwidth] = useState(false);
+  const [largeText, setLargeText] = useState(false);
 
   const t = translations[language];
 
@@ -17,8 +18,12 @@ export function LanguageProvider({ children }) {
     setLowBandwidth(prev => !prev);
   };
 
+  const toggleLargeText = () => {
+    setLargeText(prev => !prev);
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, toggleLanguage, t, lowBandwidth, toggleLowBandwidth }}>
+    <LanguageContext.Provider value={{ language, toggleLanguage, t, lowBandwidth, toggleLowBandwidth, largeText, toggleLargeText }}>
       {children}
     </LanguageContext.Provider>
   );

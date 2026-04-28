@@ -60,11 +60,21 @@ const styles = {
     cursor: 'pointer',
     fontSize: '0.95rem',
   }),
+  textBtn: (active) => ({
+    backgroundColor: active ? '#5a2d82' : 'transparent',
+    color: 'white',
+    border: '2px solid white',
+    borderRadius: '8px',
+    padding: '0.4rem 1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '0.95rem',
+  }),
 };
 
 function Navbar() {
   const { user, logout } = useAuth();
-  const { language, toggleLanguage, t, lowBandwidth, toggleLowBandwidth } = useLanguage();
+  const { language, toggleLanguage, t, lowBandwidth, toggleLowBandwidth, largeText, toggleLargeText } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -84,6 +94,9 @@ function Navbar() {
         <button style={styles.lowBandBtn(lowBandwidth)} onClick={toggleLowBandwidth}>
   {lowBandwidth ? '📶 Normal Mode' : '🐢 Low-Bandwidth'}
 </button>
+        <button style={styles.textBtn(largeText)} onClick={toggleLargeText}>
+  {largeText ? '🔡 Normal Text' : '🔠 Large Text'}
+</button>
         {user ? (
           <>
             <span style={styles.username}>👋 {t.tagline.includes('help') ? 'Hi' : 'Hola'}, {user.name}! ({user.role})</span>
@@ -98,6 +111,9 @@ function Navbar() {
             <Link to="/register" style={{ ...styles.button, backgroundColor: '#cceedd' }}>{t.register}</Link>
           </>
         )}
+        <Link to="/sesmag" style={{ ...styles.button, backgroundColor: '#f4a116', color: 'white' }}>
+  🔍 SESMag
+</Link>
       </div>
     </nav>
   );
