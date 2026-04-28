@@ -54,10 +54,13 @@ function Navbar() {
       </Link>
       <div style={styles.right}>
         {user ? (
-          <>
-            <span style={styles.username}>👋 Hi, {user.name}! ({user.role})</span>
-            <button style={styles.button} onClick={handleLogout}>Log Out</button>
-          </>
+  <>
+    <span style={styles.username}>👋 Hi, {user.name}! ({user.role})</span>
+    {user.role === 'admin' && (
+      <Link to="/admin" style={{ ...styles.button, backgroundColor: '#f4a116' }}>Admin</Link>
+    )}
+    <button style={styles.button} onClick={handleLogout}>Log Out</button>
+  </>
         ) : (
           <>
             <Link to="/login" style={styles.button}>Log In</Link>
