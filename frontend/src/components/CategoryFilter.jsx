@@ -1,11 +1,5 @@
 import React from 'react';
-
-const categories = [
-  { name: 'All', icon: '🔍' },
-  { name: 'Food Assistance', icon: '🍎' },
-  { name: 'Healthcare', icon: '🏥' },
-  { name: 'Housing & Shelters', icon: '🏠' },
-];
+import { useLanguage } from '../LanguageContext';
 
 const styles = {
   container: {
@@ -23,19 +17,29 @@ const styles = {
     fontSize: '1rem',
     fontWeight: 'bold',
     transition: 'all 0.2s',
+    cursor: 'pointer',
   }),
 };
 
 function CategoryFilter({ selected, onSelect }) {
+  const { t } = useLanguage();
+
+  const categories = [
+    { key: 'All', label: t.allCategories, icon: '🔍' },
+    { key: 'Food Assistance', label: t.food, icon: '🍎' },
+    { key: 'Healthcare', label: t.healthcare, icon: '🏥' },
+    { key: 'Housing & Shelters', label: t.housing, icon: '🏠' },
+  ];
+
   return (
     <div style={styles.container}>
       {categories.map((cat) => (
         <button
-          key={cat.name}
-          style={styles.button(selected === cat.name)}
-          onClick={() => onSelect(cat.name)}
+          key={cat.key}
+          style={styles.button(selected === cat.key)}
+          onClick={() => onSelect(cat.key)}
         >
-          {cat.icon} {cat.name}
+          {cat.icon} {cat.label}
         </button>
       ))}
     </div>

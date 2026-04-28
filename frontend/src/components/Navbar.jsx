@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { useLanguage } from '../LanguageContext';
 
 const styles = {
   nav: {
@@ -9,6 +10,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '0.5rem',
   },
   brand: {
     color: 'white',
@@ -19,7 +22,8 @@ const styles = {
   right: {
     display: 'flex',
     alignItems: 'center',
-    gap: '1rem',
+    gap: '0.8rem',
+    flexWrap: 'wrap',
   },
   username: {
     color: '#cceedd',
@@ -36,10 +40,21 @@ const styles = {
     fontSize: '0.95rem',
     textDecoration: 'none',
   },
+  langButton: {
+    backgroundColor: 'transparent',
+    color: 'white',
+    border: '2px solid white',
+    borderRadius: '8px',
+    padding: '0.4rem 1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '0.95rem',
+  },
 };
 
 function Navbar() {
   const { user, logout } = useAuth();
+  const { language, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -50,21 +65,24 @@ function Navbar() {
   return (
     <nav style={styles.nav}>
       <Link to="/" style={styles.brand}>
-        🌱 ResourceConnect
+        🌱 {t.brand}
       </Link>
       <div style={styles.right}>
+        <button style={styles.langButton} onClick={toggleLanguage}>
+          {language === 'en' ? '🇪🇸 Español' : '🇺🇸 English'}
+        </button>
         {user ? (
-  <>
-    <span style={styles.username}>👋 Hi, {user.name}! ({user.role})</span>
-    {user.role === 'admin' && (
-      <Link to="/admin" style={{ ...styles.button, backgroundColor: '#f4a116' }}>Admin</Link>
-    )}
-    <button style={styles.button} onClick={handleLogout}>Log Out</button>
-  </>
+          <>
+            <span style={styles.username}>👋 {t.tagline.includes('help') ? 'Hi' : 'Hola'}, {user.name}! ({user.role})</span>
+            {user.role === 'admin' && (
+              <Link to="/admin" style={{ ...styles.button, backgroundColor: '#f4a116' }}>{t.admin}</Link>
+            )}
+            <button style={styles.button} onClick={handleLogout}>{t.logout}</button>
+          </>
         ) : (
           <>
-            <Link to="/login" style={styles.button}>Log In</Link>
-            <Link to="/register" style={{ ...styles.button, backgroundColor: '#cceedd' }}>Register</Link>
+            <Link to="/login" style={styles.button}>{t.login}</Link>
+            <Link to="/register" style={{ ...styles.button, backgroundColor: '#cceedd' }}>{t.register}</Link>
           </>
         )}
       </div>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import ResourceCard from '../components/ResourceCard';
 import CategoryFilter from '../components/CategoryFilter';
 import ChatBot from '../components/ChatBot';
+import { useLanguage } from '../LanguageContext';
 
 const tagStyle = function(color) {
   return {
@@ -62,6 +63,8 @@ function Home() {
   const [placesLoading, setPlacesLoading] = useState(false);
   const [placesError, setPlacesError] = useState('');
 
+  const { t } = useLanguage();
+
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources')
       .then(res => { setResources(res.data); setFiltered(res.data); setLoading(false); })
@@ -100,21 +103,21 @@ function Home() {
   return (
     <div style={styles.container}>
       <div style={styles.hero}>
-        <h1 style={styles.title}>Find Help Near You</h1>
-        <p style={styles.subtitle}>Free and low-cost resources in Elizabeth, NJ — no complicated forms, no jargon.</p>
+        <h1 style={styles.title}>{t.title}</h1>
+        <p style={styles.subtitle}>{t.subtitle}</p>
       </div>
 
       <input
         style={styles.searchBar}
-        placeholder="Search for food, healthcare, housing..."
+        placeholder={t.searchPlaceholder}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
       <CategoryFilter selected={category} onSelect={setCategory} />
 
-      {loading && <p style={styles.loading}>Loading resources...</p>}
-      {!loading && filtered.length === 0 && <p style={styles.empty}>No resources found.</p>}
+      {loading && <p style={styles.loading}>{t.loading}</p>}
+      {!loading && filtered.length === 0 && <p style={styles.empty}>{t.noResults}</p>}
 
       <div style={styles.grid}>
         {filtered.map(resource => (
@@ -124,21 +127,19 @@ function Home() {
 
       <hr style={styles.divider} />
 
-      <div style={styles.sectionTitle}>Find Real Places Near You</div>
-      <p style={{ color: '#666', marginBottom: '1rem' }}>
-        Enter any city, zip code, or address to find real nearby resources.
-      </p>
+      <div style={styles.sectionTitle}>{t.nearbyTitle}</div>
+      <p style={{ color: '#666', marginBottom: '1rem' }}>{t.nearbySubtitle}</p>
 
       <div style={styles.locationRow}>
         <input
           style={styles.locationInput}
-          placeholder="e.g. Elizabeth NJ, 07201, or New York NY..."
+          placeholder={t.locationPlaceholder}
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && searchNearby()}
         />
         <button style={styles.locationButton} onClick={searchNearby}>
-          Search
+          {t.searchButton}
         </button>
       </div>
 
@@ -148,7 +149,7 @@ function Home() {
       {nearbyPlaces.length > 0 && (
         <div>
           <p style={{ color: '#666', marginBottom: '1rem' }}>
-            Found <strong>{nearbyPlaces.length}</strong> places near <strong>{location}</strong>:
+            {t.foundPlaces} <strong>{nearbyPlaces.length}</strong> {t.placesNear} <strong>{location}</strong>
           </p>
           <div style={styles.grid}>
             {nearbyPlaces.map(place => (
@@ -157,13 +158,13 @@ function Home() {
                 <div style={styles.placeAddress}>{place.address}</div>
                 <div style={styles.placeRow}>
                   {place.rating && (
-                    <span style={tagStyle('#f4a116')}>Rating: {place.rating}</span>
+                    <span style={tagStyle('#f4a116')}>{t.rating}: {place.rating}</span>
                   )}
                   {place.open_now === true && (
-                    <span style={tagStyle('#2c7a4b')}>Open Now</span>
+                    <span style={tagStyle('#2c7a4b')}>{t.openNow}</span>
                   )}
                   {place.open_now === false && (
-                    <span style={tagStyle('#888')}>Closed Now</span>
+                    <span style={tagStyle('#888')}>{t.closedNow}</span>
                   )}
                 </div>
                 <a
@@ -172,7 +173,7 @@ function Home() {
                   rel="noreferrer"
                   style={styles.mapLink}
                 >
-                  View on Google Maps
+                  {t.viewOnMaps}
                 </a>
               </div>
             ))}
