@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminRoute from './components/AdminRoute';
 import Navbar from './components/Navbar';
 import SESMagInfo from './pages/SESMagInfo';
+import Bookmarks from './pages/Bookmarks';
 
 function AppContent() {
   const { largeText } = useLanguage();
@@ -29,6 +30,7 @@ function AppContent() {
             </AdminRoute>
           } />
           <Route path="/sesmag" element={<SESMagInfo />} />
+          <Route path="/bookmarks" element={<Bookmarks />} />
         </Routes>
       </Router>
     </div>

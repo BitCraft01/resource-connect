@@ -111,4 +111,59 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// GET user bookmarks
+router.get('/bookmarks', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const result = await pool.query(
+      `SELECT r.*, c.name as category_name, c.icon, ci.name as city_name
+       FROM bookmarks b
+       JOIN resources r ON b.resource_id = r.id
+       JOIN categories c ON r.category_id = c.id
+       JOIN cities ci ON r.city_id = ci.id
+       WHERE b.session_id = $1`,
+      [String(decoded.id)]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// TOGGLE bookmark
+router.post('/bookmarks/:resourceId', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'No token' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = String(decoded.id);
+    const { resourceId } = req.params;
+
+    const existing = await pool.query(
+      'SELECT id FROM bookmarks WHERE session_id = $1 AND resource_id = $2',
+      [userId, resourceId]
+    );
+
+    if (existing.rows.length > 0) {
+      await pool.query(
+        'DELETE FROM bookmarks WHERE session_id = $1 AND resource_id = $2',
+        [userId, resourceId]
+      );
+      res.json({ bookmarked: false });
+    } else {
+      await pool.query(
+        'INSERT INTO bookmarks (session_id, resource_id) VALUES ($1, $2)',
+        [userId, resourceId]
+      );
+      res.json({ bookmarked: true });
+    }
+  } catch (err) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
 module.exports = router;

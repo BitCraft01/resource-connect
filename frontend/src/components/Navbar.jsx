@@ -103,6 +103,9 @@ function Navbar() {
             {user.role === 'admin' && (
               <Link to="/admin" style={{ ...styles.button, backgroundColor: '#f4a116' }}>{t.admin}</Link>
             )}
+            <Link to="/bookmarks" style={{ ...styles.button, backgroundColor: '#f0f0f0', color: '#333' }}>
+  🔖 Saved
+</Link>
             <button style={styles.button} onClick={handleLogout}>{t.logout}</button>
           </>
         ) : (

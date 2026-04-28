@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../AuthContext';
 
 const styles = {
   card: {
@@ -14,20 +16,16 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  nameRow: {
+    display: 'flex',
+    alignItems: 'center',
     gap: '0.5rem',
   },
-  icon: {
-    fontSize: '1.5rem',
-  },
-  name: {
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    color: '#2c7a4b',
-  },
-  description: {
-    color: '#555',
-    fontSize: '0.95rem',
-  },
+  icon: { fontSize: '1.5rem' },
+  name: { fontSize: '1.2rem', fontWeight: 'bold', color: '#2c7a4b' },
+  description: { color: '#555', fontSize: '0.95rem' },
   tag: (color) => ({
     display: 'inline-block',
     backgroundColor: color,
@@ -48,14 +46,63 @@ const styles = {
     fontWeight: 'bold',
     alignSelf: 'flex-start',
   },
+  bookmarkBtn: (saved) => ({
+    backgroundColor: saved ? '#f4a116' : 'transparent',
+    border: `2px solid ${saved ? '#f4a116' : '#ccc'}`,
+    borderRadius: '8px',
+    padding: '0.3rem 0.6rem',
+    cursor: 'pointer',
+    fontSize: '1.1rem',
+    transition: 'all 0.2s',
+  }),
 };
 
 function ResourceCard({ resource }) {
+  const { user, token } = useAuth();
+  const [saved, setSaved] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user || !token) return;
+    axios.get('http://localhost:3001/api/auth/bookmarks', {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => {
+      const ids = res.data.map(r => r.id);
+      setSaved(ids.includes(resource.id));
+    }).catch(() => {});
+  }, [user, token, resource.id]);
+
+  const toggleBookmark = async () => {
+    if (!user) return alert('Please log in to save resources!');
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `http://localhost:3001/api/auth/bookmarks/${resource.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSaved(res.data.bookmarked);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  };
+
   return (
     <div style={styles.card}>
       <div style={styles.header}>
-        <span style={styles.icon}>{resource.icon}</span>
-        <span style={styles.name}>{resource.name}</span>
+        <div style={styles.nameRow}>
+          <span style={styles.icon}>{resource.icon}</span>
+          <span style={styles.name}>{resource.name}</span>
+        </div>
+        <button
+          style={styles.bookmarkBtn(saved)}
+          onClick={toggleBookmark}
+          disabled={loading}
+          title={saved ? 'Remove bookmark' : 'Save resource'}
+        >
+          {saved ? '🔖' : '🔖'}
+        </button>
       </div>
       <p style={styles.description}>{resource.simple_description}</p>
       <div>
