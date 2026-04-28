@@ -22,7 +22,7 @@ function Bookmarks() {
 
   useEffect(() => {
     if (!token) return;
-    axios.get('http://localhost:3001/api/auth/bookmarks', {
+    axios.get('https://resource-connect-production.up.railway.app/api/auth/bookmarks', {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       setBookmarks(res.data);

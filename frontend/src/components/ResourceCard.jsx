@@ -68,7 +68,7 @@ function ResourceCard({ resource }) {
 
   useEffect(() => {
     if (!user || !token) return;
-    axios.get('http://localhost:3001/api/auth/bookmarks', {
+    axios.get('https://resource-connect-production.up.railway.app/api/auth/bookmarks', {
       headers: { Authorization: 'Bearer ' + token }
     }).then(res => {
       const ids = res.data.map(r => r.id);
@@ -81,7 +81,7 @@ function ResourceCard({ resource }) {
     setLoading(true);
     try {
       const res = await axios.post(
-        'http://localhost:3001/api/auth/bookmarks/' + resource.id,
+        'https://resource-connect-production.up.railway.app/api/auth/bookmarks/' + resource.id,
         {},
         { headers: { Authorization: 'Bearer ' + token } }
       );

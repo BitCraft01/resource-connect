@@ -76,12 +76,12 @@ function AdminDashboard() {
   }, []);
 
   const fetchResources = async () => {
-    const res = await axios.get('http://localhost:3001/api/resources');
+    const res = await axios.get('https://resource-connect-production.up.railway.app/api/resources');
     setResources(res.data);
   };
 
   const fetchUsers = async () => {
-    const res = await axios.get('http://localhost:3001/api/admin/users', { headers });
+    const res = await axios.get('https://resource-connect-production.up.railway.app/api/admin/users', { headers });
     setUsers(res.data);
   };
 
@@ -93,10 +93,10 @@ function AdminDashboard() {
   const handleSubmit = async () => {
     try {
       if (editingId) {
-        await axios.put(`http://localhost:3001/api/admin/resources/${editingId}`, form, { headers });
+        await axios.put(`https://resource-connect-production.up.railway.app/api/admin/resources/${editingId}`, form, { headers });
         setMessage('Resource updated successfully!');
       } else {
-        await axios.post('http://localhost:3001/api/admin/resources', form, { headers });
+        await axios.post('https://resource-connect-production.up.railway.app/api/admin/resources', form, { headers });
         setMessage('Resource added successfully!');
       }
       setShowForm(false);
@@ -127,7 +127,7 @@ function AdminDashboard() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this resource?')) return;
-    await axios.delete(`http://localhost:3001/api/admin/resources/${id}`, { headers });
+    await axios.delete(`https://resource-connect-production.up.railway.app/api/admin/resources/${id}`, { headers });
     setMessage('Resource deleted.');
     fetchResources();
   };

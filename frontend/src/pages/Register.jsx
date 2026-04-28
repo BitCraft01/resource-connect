@@ -104,7 +104,7 @@ function Register() {
     }
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:3001/api/auth/register', {
+      const res = await axios.post('https://resource-connect-production.up.railway.app/api/auth/register', {
         name, email, password
       });
       login(res.data.token, res.data.user);

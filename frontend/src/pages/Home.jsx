@@ -67,7 +67,7 @@ function Home() {
   
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/resources')
+    axios.get('https://resource-connect-production.up.railway.app/api/resources')
       .then(res => { setResources(res.data); setFiltered(res.data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
@@ -90,7 +90,7 @@ function Home() {
     setPlacesError('');
     setNearbyPlaces([]);
     try {
-      const res = await axios.get('http://localhost:3001/api/places', {
+      const res = await axios.get('https://resource-connect-production.up.railway.app/api/places', {
         params: { location, category }
       });
       setNearbyPlaces(res.data);

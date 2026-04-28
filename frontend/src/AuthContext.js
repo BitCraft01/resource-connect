@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      fetch('http://localhost:3001/api/auth/me', {
+      fetch('https://resource-connect-production.up.railway.app/api/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())

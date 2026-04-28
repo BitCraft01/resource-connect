@@ -96,7 +96,7 @@ function ResourceDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/resources/${id}`)
+    axios.get(`https://resource-connect-production.up.railway.app/api/resources/${id}`)
       .then(res => {
         setResource(res.data);
         setLoading(false);

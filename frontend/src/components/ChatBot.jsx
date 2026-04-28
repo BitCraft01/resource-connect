@@ -88,7 +88,7 @@ function ChatBot() {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3001/api/chat', {
+      const res = await axios.post('https://resource-connect-production.up.railway.app/api/chat', {
         message: userMessage
       });
       setMessages(prev => [...prev, { text: res.data.reply, isUser: false }]);
