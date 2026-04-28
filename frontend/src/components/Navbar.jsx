@@ -50,11 +50,21 @@ const styles = {
     cursor: 'pointer',
     fontSize: '0.95rem',
   },
+  lowBandBtn: (active) => ({
+    backgroundColor: active ? '#cc7000' : 'transparent',
+    color: 'white',
+    border: '2px solid white',
+    borderRadius: '8px',
+    padding: '0.4rem 1rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '0.95rem',
+  }),
 };
 
 function Navbar() {
   const { user, logout } = useAuth();
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, toggleLanguage, t, lowBandwidth, toggleLowBandwidth } = useLanguage();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -71,6 +81,9 @@ function Navbar() {
         <button style={styles.langButton} onClick={toggleLanguage}>
           {language === 'en' ? '🇪🇸 Español' : '🇺🇸 English'}
         </button>
+        <button style={styles.lowBandBtn(lowBandwidth)} onClick={toggleLowBandwidth}>
+  {lowBandwidth ? '📶 Normal Mode' : '🐢 Low-Bandwidth'}
+</button>
         {user ? (
           <>
             <span style={styles.username}>👋 {t.tagline.includes('help') ? 'Hi' : 'Hola'}, {user.name}! ({user.role})</span>

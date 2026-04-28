@@ -53,6 +53,7 @@ const styles = {
 };
 
 function Home() {
+    const { t, lowBandwidth } = useLanguage();
   const [resources, setResources] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [category, setCategory] = useState('All');
@@ -63,7 +64,7 @@ function Home() {
   const [placesLoading, setPlacesLoading] = useState(false);
   const [placesError, setPlacesError] = useState('');
 
-  const { t } = useLanguage();
+  
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources')
@@ -102,6 +103,11 @@ function Home() {
 
   return (
     <div style={styles.container}>
+        {lowBandwidth && (
+        <div style={styles.banner}>
+          🐢 Low-Bandwidth Mode is ON — simplified view to save data
+        </div>
+      )}
       <div style={styles.hero}>
         <h1 style={styles.title}>{t.title}</h1>
         <p style={styles.subtitle}>{t.subtitle}</p>
@@ -121,7 +127,24 @@ function Home() {
 
       <div style={styles.grid}>
         {filtered.map(resource => (
+            lowBandwidth ? (
+            <div key={resource.id} style={styles.lowBandCard}>
+              <div style={{ fontWeight: 'bold', color: '#2c7a4b' }}>
+                {resource.category_name} — {resource.name}
+              </div>
+              <div style={{ fontSize: '0.9rem', color: '#555', margin: '0.3rem 0' }}>
+                {resource.simple_description}
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#888' }}>
+                {resource.address} · {resource.phone}
+              </div>
+              <a href={`/resource/${resource.id}`} style={{ color: '#2c7a4b', fontWeight: 'bold', fontSize: '0.9rem' }}>
+                {t.seeDetails}
+              </a>
+            </div>
+          ) : (
           <ResourceCard key={resource.id} resource={resource} />
+          )
         ))}
       </div>
 
@@ -153,6 +176,23 @@ function Home() {
           </p>
           <div style={styles.grid}>
             {nearbyPlaces.map(place => (
+                lowBandwidth ? (
+                <div key={place.id} style={styles.lowBandPlaceCard}>
+                  <div style={{ fontWeight: 'bold', color: '#1a6896' }}>{place.name}</div>
+                  <div style={{ fontSize: '0.9rem', color: '#555' }}>{place.address}</div>
+                  {place.rating && (
+                    <div style={{ fontSize: '0.85rem', color: '#888' }}>{t.rating}: {place.rating}</div>
+                  )}
+                  <a
+                    href={'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place.name + ' ' + place.address)}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: '#1a6896', fontWeight: 'bold', fontSize: '0.9rem' }}
+                  >
+                    {t.viewOnMaps}
+                  </a>
+                </div>
+              ) : (
               <div key={place.id} style={styles.placeCard}>
                 <div style={styles.placeName}>{place.name}</div>
                 <div style={styles.placeAddress}>{place.address}</div>
@@ -176,6 +216,7 @@ function Home() {
                   {t.viewOnMaps}
                 </a>
               </div>
+              )
             ))}
           </div>
         </div>
