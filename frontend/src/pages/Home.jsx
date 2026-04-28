@@ -4,52 +4,51 @@ import ResourceCard from '../components/ResourceCard';
 import CategoryFilter from '../components/CategoryFilter';
 import ChatBot from '../components/ChatBot';
 
+const tagStyle = function(color) {
+  return {
+    display: 'inline-block',
+    backgroundColor: color,
+    color: 'white',
+    borderRadius: '12px',
+    padding: '0.2rem 0.7rem',
+    fontSize: '0.8rem',
+  };
+};
+
 const styles = {
-  container: {
-    maxWidth: '900px',
-    margin: '0 auto',
-    padding: '2rem 1rem',
-  },
-  hero: {
-    textAlign: 'center',
-    marginBottom: '2rem',
-  },
-  title: {
-    fontSize: '2rem',
-    fontWeight: 'bold',
-    color: '#2c7a4b',
-    marginBottom: '0.5rem',
-  },
-  subtitle: {
-    fontSize: '1.1rem',
-    color: '#666',
-  },
+  container: { maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' },
+  hero: { textAlign: 'center', marginBottom: '2rem' },
+  title: { fontSize: '2rem', fontWeight: 'bold', color: '#2c7a4b', marginBottom: '0.5rem' },
+  subtitle: { fontSize: '1.1rem', color: '#666' },
   searchBar: {
-    width: '100%',
-    padding: '0.8rem 1.2rem',
-    fontSize: '1rem',
-    borderRadius: '25px',
-    border: '2px solid #2c7a4b',
-    outline: 'none',
-    marginBottom: '1rem',
+    width: '100%', padding: '0.8rem 1.2rem', fontSize: '1rem',
+    borderRadius: '25px', border: '2px solid #2c7a4b', outline: 'none', marginBottom: '1rem',
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-    gap: '1.5rem',
+  locationRow: { display: 'flex', gap: '0.8rem', marginBottom: '1rem' },
+  locationInput: {
+    flex: 1, padding: '0.8rem 1.2rem', fontSize: '1rem',
+    borderRadius: '25px', border: '2px solid #1a6896', outline: 'none',
   },
-  empty: {
-    textAlign: 'center',
-    color: '#888',
-    fontSize: '1.1rem',
-    marginTop: '2rem',
+  locationButton: {
+    padding: '0.8rem 1.5rem', backgroundColor: '#1a6896', color: 'white',
+    border: 'none', borderRadius: '25px', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer',
   },
-  loading: {
-    textAlign: 'center',
-    color: '#2c7a4b',
-    fontSize: '1.1rem',
-    marginTop: '2rem',
+  sectionTitle: {
+    fontSize: '1.3rem', fontWeight: 'bold', color: '#333',
+    margin: '1.5rem 0 1rem 0', paddingBottom: '0.5rem', borderBottom: '2px solid #eee',
   },
+  grid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' },
+  placeCard: {
+    backgroundColor: 'white', borderRadius: '12px', padding: '1.2rem',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', gap: '0.4rem',
+  },
+  placeName: { fontSize: '1.1rem', fontWeight: 'bold', color: '#1a6896' },
+  placeAddress: { fontSize: '0.9rem', color: '#555' },
+  placeRow: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.3rem' },
+  mapLink: { marginTop: '0.5rem', display: 'inline-block', color: '#1a6896', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 'bold' },
+  empty: { textAlign: 'center', color: '#888', fontSize: '1.1rem', marginTop: '2rem' },
+  loading: { textAlign: 'center', color: '#2c7a4b', fontSize: '1.1rem', marginTop: '2rem' },
+  divider: { margin: '2rem 0', border: 'none', borderTop: '3px dashed #ddd' },
 };
 
 function Home() {
@@ -58,25 +57,20 @@ function Home() {
   const [category, setCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [location, setLocation] = useState('');
+  const [nearbyPlaces, setNearbyPlaces] = useState([]);
+  const [placesLoading, setPlacesLoading] = useState(false);
+  const [placesError, setPlacesError] = useState('');
 
   useEffect(() => {
     axios.get('http://localhost:3001/api/resources')
-      .then(res => {
-        setResources(res.data);
-        setFiltered(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      .then(res => { setResources(res.data); setFiltered(res.data); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     let results = resources;
-    if (category !== 'All') {
-      results = results.filter(r => r.category_name === category);
-    }
+    if (category !== 'All') results = results.filter(r => r.category_name === category);
     if (search.trim()) {
       results = results.filter(r =>
         r.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -86,18 +80,33 @@ function Home() {
     setFiltered(results);
   }, [category, search, resources]);
 
+  const searchNearby = async () => {
+    if (!location.trim()) return;
+    setPlacesLoading(true);
+    setPlacesError('');
+    setNearbyPlaces([]);
+    try {
+      const res = await axios.get('http://localhost:3001/api/places', {
+        params: { location, category }
+      });
+      setNearbyPlaces(res.data);
+      if (res.data.length === 0) setPlacesError('No places found. Try a different location.');
+    } catch (err) {
+      setPlacesError('Could not find places. Please try again.');
+    }
+    setPlacesLoading(false);
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.hero}>
         <h1 style={styles.title}>Find Help Near You</h1>
-        <p style={styles.subtitle}>
-          Free and low-cost resources in Elizabeth, NJ — no complicated forms, no jargon.
-        </p>
+        <p style={styles.subtitle}>Free and low-cost resources in Elizabeth, NJ — no complicated forms, no jargon.</p>
       </div>
 
       <input
         style={styles.searchBar}
-        placeholder="🔍 Search for food, healthcare, housing..."
+        placeholder="Search for food, healthcare, housing..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
@@ -105,16 +114,71 @@ function Home() {
       <CategoryFilter selected={category} onSelect={setCategory} />
 
       {loading && <p style={styles.loading}>Loading resources...</p>}
-
-      {!loading && filtered.length === 0 && (
-        <p style={styles.empty}>No resources found. Try a different search or category.</p>
-      )}
+      {!loading && filtered.length === 0 && <p style={styles.empty}>No resources found.</p>}
 
       <div style={styles.grid}>
         {filtered.map(resource => (
           <ResourceCard key={resource.id} resource={resource} />
         ))}
       </div>
+
+      <hr style={styles.divider} />
+
+      <div style={styles.sectionTitle}>Find Real Places Near You</div>
+      <p style={{ color: '#666', marginBottom: '1rem' }}>
+        Enter any city, zip code, or address to find real nearby resources.
+      </p>
+
+      <div style={styles.locationRow}>
+        <input
+          style={styles.locationInput}
+          placeholder="e.g. Elizabeth NJ, 07201, or New York NY..."
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && searchNearby()}
+        />
+        <button style={styles.locationButton} onClick={searchNearby}>
+          Search
+        </button>
+      </div>
+
+      {placesLoading && <p style={styles.loading}>Searching for nearby places...</p>}
+      {placesError && <p style={styles.empty}>{placesError}</p>}
+
+      {nearbyPlaces.length > 0 && (
+        <div>
+          <p style={{ color: '#666', marginBottom: '1rem' }}>
+            Found <strong>{nearbyPlaces.length}</strong> places near <strong>{location}</strong>:
+          </p>
+          <div style={styles.grid}>
+            {nearbyPlaces.map(place => (
+              <div key={place.id} style={styles.placeCard}>
+                <div style={styles.placeName}>{place.name}</div>
+                <div style={styles.placeAddress}>{place.address}</div>
+                <div style={styles.placeRow}>
+                  {place.rating && (
+                    <span style={tagStyle('#f4a116')}>Rating: {place.rating}</span>
+                  )}
+                  {place.open_now === true && (
+                    <span style={tagStyle('#2c7a4b')}>Open Now</span>
+                  )}
+                  {place.open_now === false && (
+                    <span style={tagStyle('#888')}>Closed Now</span>
+                  )}
+                </div>
+                <a
+                  href={'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(place.name + ' ' + place.address)}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={styles.mapLink}
+                >
+                  View on Google Maps
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ChatBot />
     </div>

@@ -12,10 +12,12 @@ app.use(express.json());
 const resourcesRouter = require('./routes/resources');
 const chatRouter = require('./routes/chat');
 const authRouter = require('./routes/auth');
+const placesRouter = require('./routes/places');
 
 app.use('/api/resources', resourcesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/places', placesRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
